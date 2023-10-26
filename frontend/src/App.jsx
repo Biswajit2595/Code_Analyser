@@ -23,7 +23,7 @@ function App() {
   })
 
   const handleDebug = () => {
-    if(code==='// Enter Your Code Here'){
+    if(code==='// Enter Your Code Here' || code===""){
       toast({
         position:"top",
         title: 'No Code found',
@@ -45,7 +45,7 @@ function App() {
   };
 
   const handleConvert = () => {
-    if(code==='// Enter Your Code Here'){
+    if(code==='// Enter Your Code Here' || code===""){
       toast({
         position:"top",
         title: 'No Code found',
@@ -72,7 +72,7 @@ function App() {
   
 
   const handleQuality = () => {
-    if(code==='// Enter Your Code Here'){
+    if(code==='// Enter Your Code Here' || code===""){
       toast({
         position:"top",
         title: 'No Code found',
