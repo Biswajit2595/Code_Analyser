@@ -1,11 +1,20 @@
 const express=require("express")
 const cors=require("cors")
 const axios=require("axios")
+const { Octokit } = require("@octokit/core")
+const fetch=require("node-fetch")
 const app=express()
 require("dotenv").config()
 app.use(cors())
 app.use(express.json())
 const PORT=process.env.PORT
+
+const octokit=new Octokit({
+    auth:process.env.GITHUB_TOKEN,
+    request:{
+        fetch:fetch,
+    },
+});
 
 app.get("/",(req,res)=>{
     res.send("Code Converter,code Debugger,Code Quality Analysis")
@@ -31,8 +40,8 @@ app.post("/convert", async (req, res) => {
                 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
             }
         });
-        let convertedCode=response.data.choices[0].message.content
-        res.status(200).send(convertedCode);
+        // let convertedCode=response.data.choices[0].message.content
+        res.status(200).send({"data":response.data.choices[0].message.content});
     } catch (error) {
         console.error(error.message);
         res.status(500).send({ "error": error.message });
@@ -93,6 +102,32 @@ app.post("/debug", async (req, res) => {
         res.status(500).send({ "error": error.message });
     }
 });
+
+//github
+app.post("/github",async(req,res)=>{
+    const {owner,repo,filepath}=req.body;
+    try {
+        const response = await octokit.request(
+            'GET /repos/{owner}/{repo}/contents/{path}',
+            {
+                owner: owner,
+                repo: repo,
+                path: filepath,
+                headers: {
+                "X-GitHub-Api-Version": "2022-11-28",
+                },
+            }
+        );
+    
+        const data = Buffer.from(response.data.content, "base64").toString(
+            "utf-8"
+        );
+        res.status(200).send(data);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send({ "error": error.message });
+    }
+})
 
 
 app.listen(PORT,()=>{
